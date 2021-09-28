@@ -35,5 +35,9 @@ Here how to make your own discord bot:
 (ex: speak, connect, use voice activity, send messenges, view channel,... u can add all).
 
 - now after you do all of that now look at the box called " Scopes " look down a bit there's a link. Copy that and paste in ur browers then invite it to your server.
+
+
 /////////// the bot token is in the "Bot"////////////
+
+
 Now u can run the replit and enjoy your bot! ^^
