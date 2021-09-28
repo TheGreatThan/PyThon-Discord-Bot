@@ -16,7 +16,12 @@ Step 4: Copy the code and add your bot token.
 // the paste the bot token in ("your bot token here")
 
 Step 5: click run and enjoys!
+
+
 \\----------------------------------//
+
+
+
 Here how to make your own discord bot:
 - open this link :"https://discord.com/developers/applications".
 
