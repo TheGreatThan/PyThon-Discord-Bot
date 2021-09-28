@@ -38,6 +38,10 @@ Here how to make your own discord bot:
 
 
 /////////// the bot's token is in the "Bot"////////////
-Remember to download the PyNaCl
+
+
+Remember to download the PyNaCl Package! 
+
+(To download package in Replit just click on the Cube button in the middle left then search for it then press the plus in PyNaCl)
 
 Now u can run the replit and enjoy your bot! ^^
