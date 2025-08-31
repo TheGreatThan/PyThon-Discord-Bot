@@ -57,6 +57,11 @@ def parse_duration(timestamp):
 
 
 def after_playback(ctx, filepath):
+    """Callback function to clean up the audio file and play the next song."""
+    # Check if we are seeking; if so, do not proceed to the next song.
+    if now_playing.get(ctx.guild.id, {}).get('seeking', False):
+        return
+
     if os.path.exists(filepath):
         try:
             os.remove(filepath)
@@ -66,6 +71,9 @@ def after_playback(ctx, filepath):
 
 
 def start_playing(ctx, song, seek_offset=0):
+    """Helper function to start playing a song, with an optional seek time."""
+    # Ensure the seeking flag is reset when a song starts.
+    song['seeking'] = False
     now_playing[ctx.guild.id] = song
     song['start_time'] = time.time() - seek_offset
 
@@ -79,13 +87,14 @@ def start_playing(ctx, song, seek_offset=0):
     ctx.voice_client.play(transformed_source, after=lambda e: after_playback(ctx, song['filepath']))
 
     message = f"**{song['title']}**"
-    if seek_offset > 0: message += f" (started at {format_duration(seek_offset)})"
+    if seek_offset > 0: message += f" (restarted at {format_duration(seek_offset)})"
 
     embed = create_embed("🎶 Now Playing", message, discord.Color.blue())
     asyncio.run_coroutine_threadsafe(ctx.send(embed=embed), client.loop)
 
 
 def play_next(ctx):
+    """Plays the next song in the queue."""
     if ctx.guild.id in queues and queues[ctx.guild.id]:
         song = queues[ctx.guild.id].pop(0)
         start_playing(ctx, song)
@@ -141,7 +150,6 @@ async def play(ctx, *, query: str):
         return await ctx.send(embed=create_embed("❌ Error", "You need to be in a voice channel to use this command!",
                                                  discord.Color.red()))
 
-    # If bot is already in a channel, check if the user is in the same one
     if ctx.voice_client and ctx.voice_client.channel != ctx.author.voice.channel:
         return await ctx.send(
             embed=create_embed("❌ Access Denied", "You must be in the same voice channel as the bot to add songs.",
@@ -255,8 +263,10 @@ async def seek(ctx, *, timestamp: str):
         return await ctx.send(
             embed=create_embed("❌ Invalid Format", "Please use `MM:SS` or `HH:MM:SS`.", discord.Color.red()))
 
+    now_playing[ctx.guild.id]['seeking'] = True
     ctx.voice_client.stop()
-    await asyncio.sleep(0.5)
+    await asyncio.sleep(1)
+
     start_playing(ctx, song, seek_offset=seek_in_seconds)
 
 
@@ -294,7 +304,7 @@ async def queue(ctx):
 async def skip(ctx):
     if ctx.voice_client and ctx.voice_client.is_playing():
         ctx.voice_client.stop()
-        # The after_playback function will send the "Now Playing" message for the next song
+        # The after_playback function will handle the response
     else:
         await ctx.send(embed=create_embed("❌ Error", "There is no song to skip.", discord.Color.red()))
 
