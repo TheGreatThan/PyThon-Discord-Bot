@@ -32,6 +32,16 @@ def create_embed(title, description, color):
     return discord.Embed(title=title, description=description, color=color)
 
 
+async def is_in_same_channel(ctx):
+    """A check to see if the user is in the same voice channel as the bot."""
+    if ctx.author.voice and ctx.voice_client and ctx.author.voice.channel == ctx.voice_client.channel:
+        return True
+    await ctx.send(
+        embed=create_embed("❌ Access Denied", "You must be in the same voice channel as the bot to use this command.",
+                           discord.Color.red()))
+    return False
+
+
 def format_duration(seconds):
     if seconds is None: return 'N/A'
     minutes, seconds = divmod(int(seconds), 60)
@@ -116,14 +126,13 @@ async def join(ctx):
 
 
 @client.command(name='leave', help='To make the bot leave the voice channel')
+@commands.check(is_in_same_channel)
 async def leave(ctx):
     if ctx.guild.id in queues: queues.pop(ctx.guild.id)
     if ctx.guild.id in now_playing: now_playing.pop(ctx.guild.id)
     if ctx.voice_client and ctx.voice_client.is_connected():
         await ctx.voice_client.disconnect()
         await ctx.send(embed=create_embed("☑ Disconnected", "I have left the voice channel.", discord.Color.blurple()))
-    else:
-        await ctx.send(embed=create_embed("❌ Error", "I am not in a voice channel.", discord.Color.red()))
 
 
 @client.command(name='play', help='Searches for and plays a song by name or URL')
@@ -131,6 +140,13 @@ async def play(ctx, *, query: str):
     if not ctx.author.voice:
         return await ctx.send(embed=create_embed("❌ Error", "You need to be in a voice channel to use this command!",
                                                  discord.Color.red()))
+
+    # If bot is already in a channel, check if the user is in the same one
+    if ctx.voice_client and ctx.voice_client.channel != ctx.author.voice.channel:
+        return await ctx.send(
+            embed=create_embed("❌ Access Denied", "You must be in the same voice channel as the bot to add songs.",
+                               discord.Color.red()))
+
     if not ctx.voice_client:
         await ctx.author.voice.channel.connect()
 
@@ -180,7 +196,8 @@ async def play(ctx, *, query: str):
         play_next(ctx)
 
 
-@client.command(name='np', help='Shows the currently playing song with a live progress bar')
+@client.command(name='np', help='Shows the currently playing song')
+@commands.check(is_in_same_channel)
 async def np(ctx):
     if ctx.guild.id not in now_playing:
         return await ctx.send(
@@ -224,6 +241,7 @@ async def np(ctx):
 
 
 @client.command(name='seek', help='Skips to a specific timestamp in the song (e.g., 1:23)')
+@commands.check(is_in_same_channel)
 async def seek(ctx, *, timestamp: str):
     if ctx.guild.id not in now_playing:
         return await ctx.send(embed=create_embed("❌ Error", "Nothing is currently playing.", discord.Color.red()))
@@ -243,6 +261,7 @@ async def seek(ctx, *, timestamp: str):
 
 
 @client.command(name='volume', help='Changes the bot\'s volume (0-200)')
+@commands.check(is_in_same_channel)
 async def volume(ctx, vol: int):
     if not ctx.voice_client or not ctx.voice_client.is_playing():
         return await ctx.send(embed=create_embed("❌ Error", "I'm not currently playing anything.", discord.Color.red()))
@@ -255,6 +274,7 @@ async def volume(ctx, vol: int):
 
 
 @client.command(name='queue', help='Displays the current song queue')
+@commands.check(is_in_same_channel)
 async def queue(ctx):
     embed = create_embed("🎶 Song Queue", "", discord.Color.purple())
 
@@ -270,15 +290,17 @@ async def queue(ctx):
 
 
 @client.command(name='skip', help='Skips the current song')
+@commands.check(is_in_same_channel)
 async def skip(ctx):
     if ctx.voice_client and ctx.voice_client.is_playing():
         ctx.voice_client.stop()
-        await ctx.send(embed=create_embed("⏭️ Skipped", "The current song has been skipped.", discord.Color.blue()))
+        # The after_playback function will send the "Now Playing" message for the next song
     else:
         await ctx.send(embed=create_embed("❌ Error", "There is no song to skip.", discord.Color.red()))
 
 
 @client.command(name='clear', help='Clears the entire song queue')
+@commands.check(is_in_same_channel)
 async def clear(ctx):
     if ctx.guild.id in queues and queues[ctx.guild.id]:
         queues[ctx.guild.id].clear()
@@ -288,6 +310,7 @@ async def clear(ctx):
 
 
 @client.command(name='pause', help='This command pauses the song')
+@commands.check(is_in_same_channel)
 async def pause(ctx):
     if ctx.voice_client and ctx.voice_client.is_playing():
         ctx.voice_client.pause()
@@ -295,6 +318,7 @@ async def pause(ctx):
 
 
 @client.command(name='resume', help='Resumes the song')
+@commands.check(is_in_same_channel)
 async def resume(ctx):
     if ctx.voice_client and ctx.voice_client.is_paused():
         ctx.voice_client.resume()
@@ -302,6 +326,7 @@ async def resume(ctx):
 
 
 @client.command(name='stop', help='Stops the music and clears the queue')
+@commands.check(is_in_same_channel)
 async def stop(ctx):
     if ctx.guild.id in queues:
         for song in queues[ctx.guild.id]:
