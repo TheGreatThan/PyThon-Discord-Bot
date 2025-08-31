@@ -6,16 +6,16 @@ A simple discord Python bot I made.
 
 -Hi, I'm Than! Thank for Using My Bot. I Know Its not perfect and took kinda long to run but here the step.
 -instructions:
-Step 1: make Your own replit account.
+Step 1: Download Pycharm.
 
-Step 2: Click the plus("+") on the top right of your screen.
+Step 2: Create a new project.
 
-Step 3: Choose Python as the main language.
+Step 3: Copy the code.
 
-Step 4: Copy the code and add your bot token.
-// the paste the bot token in ("your bot token here")
+Step 4: At the same folder of your main.py (or what ever it is) create a file ".env" with the text TOKEN = YourBotToken.
+//then save the file.
 
-Step 5: click run and enjoys!
+Step 5: Follow everything i add below.
 
 
 \\----------------------------------//
@@ -36,12 +36,46 @@ Here how to make your own discord bot:
 
 - now after you do all of that now look at the box called " Scopes " look down a bit there's a link. Copy that and paste in ur browers then invite it to your server.
 
+- In the "Bot" section, your bot's token should be there.
+
 
 /////////// the bot's token is in the "Bot"////////////
+#Required Packages:
+PyNaCl
+discord.py
+yt-dlp
 
+## Install FFmpeg
+You need to download FFmpeg and tell your computer where to find it.
 
-Remember to download the PyNaCl Package! 
+Download FFmpeg:
 
-(To download package in Replit just click on the Cube button in the middle left then search for it then press the plus in PyNaCl)
+Go to the official FFmpeg download site: ffmpeg.org/download.html
 
-Now u can run the replit and enjoy your bot! ^^
+Hover over the Windows logo and click the gyan.dev link.
+
+Download the ffmpeg-release-full.7z archive.
+
+Extract the Files:
+
+Use a program like 7-Zip or WinRAR to extract the archive.
+
+Inside, you'll find a folder. Rename it to simply ffmpeg and move it to a permanent location, like directly on your C:\ drive (C:\ffmpeg).
+
+Add FFmpeg to your System PATH:
+
+This is the most important step. It lets your computer find FFmpeg from any terminal.
+
+Press the Windows Key, type env, and click on "Edit the system environment variables".
+
+In the window that opens, click the "Environment Variables..." button.
+
+Under "System variables," find the variable named Path and click "Edit...".
+
+Click "New" and paste the path to the bin folder inside your FFmpeg directory. If you followed the steps above, this will be: C:\ffmpeg\bin
+
+Click OK on all windows to save the changes.
+
+Restart your code editor (PyCharm/VS Code) and terminal for the changes to take effect.
+
+Enjoy!
