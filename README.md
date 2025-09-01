@@ -40,9 +40,13 @@ Here how to make your own discord bot:
 
 
 /////////// the bot's token is in the "Bot"////////////
+
 #Required Packages:
+
 PyNaCl
+
 discord.py
+
 yt-dlp
 
 ## Install FFmpeg
