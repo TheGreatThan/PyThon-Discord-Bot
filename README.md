@@ -49,6 +49,10 @@ discord.py
 
 yt-dlp
 
+yarl
+
+
+
 ## Install FFmpeg
 You need to download FFmpeg and tell your computer where to find it.
 
